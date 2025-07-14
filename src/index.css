@@ -3,3 +3,9 @@
 body, html{
   background: "transpernt";
 }
+
+body {
+  background: radial-gradient(ellipse at bottom, #0b0c1a 0%, #000 100%);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
