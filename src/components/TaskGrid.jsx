@@ -1,8 +1,14 @@
-// components/TaskGrid.jsx
 import { motion, AnimatePresence } from "framer-motion";
 import TaskItem from "./TaskItem";
 
-export default function TaskGrid({ tasks, onToggle, onDelete, onEdit, onToggleDoLater }) {
+export default function TaskGrid({
+  tasks,
+  onToggle,
+  onDelete,
+  onEdit,
+  onToggleDoLater,
+  onUpdateChecklist,
+}) {
   const active = tasks.filter((t) => !t.done && !t.doLater);
   const done = tasks.filter((t) => t.done);
   const later = tasks.filter((t) => !t.done && t.doLater);
@@ -35,6 +41,7 @@ export default function TaskGrid({ tasks, onToggle, onDelete, onEdit, onToggleDo
                   onDelete={onDelete}
                   onEdit={onEdit}
                   onToggleDoLater={onToggleDoLater}
+                  onUpdateChecklist={onUpdateChecklist}
                 />
               </motion.div>
             ))}
@@ -62,6 +69,7 @@ export default function TaskGrid({ tasks, onToggle, onDelete, onEdit, onToggleDo
                   onDelete={onDelete}
                   onEdit={onEdit}
                   onToggleDoLater={onToggleDoLater}
+                  onUpdateChecklist={onUpdateChecklist}
                 />
               </motion.div>
             ))}
@@ -89,6 +97,7 @@ export default function TaskGrid({ tasks, onToggle, onDelete, onEdit, onToggleDo
                   onDelete={onDelete}
                   onEdit={onEdit}
                   onToggleDoLater={onToggleDoLater}
+                  onUpdateChecklist={onUpdateChecklist}
                 />
               </motion.div>
             ))}

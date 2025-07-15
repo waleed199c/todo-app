@@ -6,8 +6,16 @@ import { useState } from "react";
 import TaskGrid from "./components/TaskGrid";
 
 function App() {
-  const { tasks, addTask, toggleTask, deleteTask, editTask, toggleDoLater } =
-    useTasks();
+  const {
+    tasks,
+    addTask,
+    toggleTask,
+    deleteTask,
+    editTask,
+    toggleDoLater,
+    onUpdateChecklist,
+    onUpdateFinishBefore,
+  } = useTasks();
   const [filter, setFilter] = useState("all");
   const [moodFilter, setMoodFilter] = useState(null);
 
@@ -79,6 +87,8 @@ function App() {
             onDelete={deleteTask}
             onEdit={editTask}
             onToggleDoLater={toggleDoLater}
+            onUpdateChecklist={onUpdateChecklist}
+            onUpdateFinishBefore={onUpdateFinishBefore}
           />
         </div>
       </main>

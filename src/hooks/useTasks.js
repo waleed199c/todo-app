@@ -5,31 +5,29 @@ export function useTasks() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('tasks')) || [];
+    const stored = JSON.parse(localStorage.getItem("tasks")) || [];
     setTasks(stored);
     setLoaded(true);
   }, []);
 
   useEffect(() => {
     if (loaded) {
-      console.log("Saving to localStorage:", tasks);
-      localStorage.setItem('tasks', JSON.stringify(tasks));
+      localStorage.setItem("tasks", JSON.stringify(tasks));
     }
   }, [tasks, loaded]);
 
-  const addTask = (text, mood = null, description = "") => {
-    const now = new Date();
+  const addTask = (text) => {
     const newTask = {
       id: crypto.randomUUID(),
       text,
       done: false,
       doLater: false,
-      mood,
-      description,
+      mood: null,
+      createdAt: Date.now(),
+      lastModified: Date.now(),
+      description: "",
       checklist: [],
-      createdAt: now.toISOString(),
-      lastModified: now.toISOString(),
-      history: [],
+      finishBefore: null,
     };
     setTasks((prev) => [...prev, newTask]);
   };
@@ -38,11 +36,7 @@ export function useTasks() {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === id
-          ? {
-              ...task,
-              done: !task.done,
-              lastModified: new Date().toISOString(),
-            }
+          ? { ...task, done: !task.done, lastModified: Date.now() }
           : task
       )
     );
@@ -52,20 +46,21 @@ export function useTasks() {
     setTasks((prev) => prev.filter((task) => task.id !== id));
   };
 
-  const editTask = (id, newText, newMood = null, newDescription = null) => {
+  const editTask = (id, newText, mood = null, description = null) => {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === id
           ? {
               ...task,
-              text: newText,
-              lastModified: new Date().toISOString(),
+              text: newText ?? task.text,
+              mood: mood !== null ? mood : task.mood,
+              description:
+                description !== null ? description : task.description,
+              lastModified: Date.now(),
               history: [
                 ...(task.history || []),
-                { text: task.text, at: new Date().toISOString() },
+                { text: task.text, at: Date.now() },
               ],
-              mood: newMood !== null ? newMood : task.mood,
-              description: newDescription !== null ? newDescription : task.description,
             }
           : task
       )
@@ -79,12 +74,92 @@ export function useTasks() {
           ? {
               ...task,
               doLater: !task.doLater,
-              lastModified: new Date().toISOString(),
+              lastModified: Date.now(),
+            }
+          : task
+      )
+    );
+  };
+  const onUpdateChecklist = (id, checklist) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, checklist, lastModified: Date.now() } : task
+      )
+    );
+  };
+  const onUpdateFinishBefore = (id, datetime) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              finishBefore: datetime,
+              lastModified: Date.now(),
             }
           : task
       )
     );
   };
 
-  return { tasks, addTask, toggleTask, deleteTask, editTask, toggleDoLater };
+  const onAddSubItem = (id, text) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              items: [...(task.items || []), { text, done: false }],
+              lastModified: Date.now(),
+            }
+          : task
+      )
+    );
+  };
+
+  const onToggleSubItem = (id, index) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id === id) {
+          const updatedItems = [...(task.items || [])];
+          updatedItems[index].done = !updatedItems[index].done;
+          return {
+            ...task,
+            items: updatedItems,
+            lastModified: Date.now(),
+          };
+        }
+        return task;
+      })
+    );
+  };
+
+  const onRemoveSubItem = (id, index) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id === id) {
+          const updatedItems = [...(task.items || [])];
+          updatedItems.splice(index, 1);
+          return {
+            ...task,
+            items: updatedItems,
+            lastModified: Date.now(),
+          };
+        }
+        return task;
+      })
+    );
+  };
+
+  return {
+    tasks,
+    addTask,
+    toggleTask,
+    deleteTask,
+    editTask,
+    toggleDoLater,
+    onUpdateChecklist,
+    onUpdateFinishBefore,
+    onAddSubItem,
+    onToggleSubItem,
+    onRemoveSubItem,
+  };
 }
